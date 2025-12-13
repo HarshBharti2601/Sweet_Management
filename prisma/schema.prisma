@@ -7,55 +7,50 @@ datasource db {
   provider = "postgresql"
 }
 
-model Customer {
-  id           String @id
-  customerName String
-  phoneNumber  String @unique
-  gender       String
-  age          Int
-  region       String
-  customerType String
-  Sale         Sale[]
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  inventoryLogs InventoryLog[]
 }
 
-model Employee {
-  id           String @id
-  employeeName String
-  Sale         Sale[]
+enum Role {
+  USER
+  ADMIN
 }
 
-model Product {
-  id          String @id
-  productName String
-  brand       String
-  category    String
-  tags        String
-  Sale        Sale[]
+model Sweet {
+  id        String   @id @default(uuid())
+  name      String
+  category  String
+  price     Float
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  inventoryLogs InventoryLog[]
+
+  @@index([name])
+  @@index([category])
 }
 
-model Sale {
-  id                 String   @id
-  customerId         String
-  productId          String
-  storeId            String
-  employeeId         String
-  quantity           Int
-  pricePerUnit       Float
-  discountPercentage Float
-  totalAmount        Float
-  finalAmount        Float
-  date               DateTime
-  paymentMethod      String
-  orderStatus        String
-  deliveryType       String
-  Customer           Customer @relation(fields: [customerId], references: [id])
-  Employee           Employee @relation(fields: [employeeId], references: [id])
-  Product            Product  @relation(fields: [productId], references: [id])
-  Store              Store    @relation(fields: [storeId], references: [id])
+model InventoryLog {
+  id        String   @id @default(uuid())
+  userId    String
+  sweetId   String
+  action    InventoryAction
+  quantity  Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  sweet Sweet @relation(fields: [sweetId], references: [id])
 }
 
-model Store {
-  id       String @id
-  location String
-  Sale     Sale[]
+enum InventoryAction {
+  PURCHASE
+  RESTOCK
 }
