@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Customer {
+  id           String @id
+  customerName String
+  phoneNumber  String @unique
+  gender       String
+  age          Int
+  region       String
+  customerType String
+  Sale         Sale[]
+}
+
+model Employee {
+  id           String @id
+  employeeName String
+  Sale         Sale[]
+}
+
+model Product {
+  id          String @id
+  productName String
+  brand       String
+  category    String
+  tags        String
+  Sale        Sale[]
+}
+
+model Sale {
+  id                 String   @id
+  customerId         String
+  productId          String
+  storeId            String
+  employeeId         String
+  quantity           Int
+  pricePerUnit       Float
+  discountPercentage Float
+  totalAmount        Float
+  finalAmount        Float
+  date               DateTime
+  paymentMethod      String
+  orderStatus        String
+  deliveryType       String
+  Customer           Customer @relation(fields: [customerId], references: [id])
+  Employee           Employee @relation(fields: [employeeId], references: [id])
+  Product            Product  @relation(fields: [productId], references: [id])
+  Store              Store    @relation(fields: [storeId], references: [id])
+}
+
+model Store {
+  id       String @id
+  location String
+  Sale     Sale[]
+}
