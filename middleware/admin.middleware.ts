@@ -1,16 +1,20 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express"
+import type { AuthenticatedRequest } from "./auth.middleware.js"
 
 export const isAdmin = (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
-  // Assume role is attached after JWT decode
-  const isAdminUser = true;
-
-  if (!isAdminUser) {
-    return res.status(403).json({ message: "Admin access required" });
+  if (!req.user) {
+    res.status(401).json({ message: "Unauthorized" })
+    return
   }
 
-  next();
-};
+  if (req.user.role !== "ADMIN") {
+    res.status(403).json({ message: "Admin access required" })
+    return
+  }
+
+  next()
+}
